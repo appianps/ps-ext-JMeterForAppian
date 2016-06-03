@@ -63,6 +63,7 @@
 		        <configuration>
 		        	<excludes>
 		            	<exclude>*.jmx</exclude>
+		            	<exclude>*.jar</exclude>
 		        	</excludes>
 		        </configuration>
       		</plugin>
@@ -82,6 +83,24 @@
 		        <artifactId>maven-surefire-plugin</artifactId>
 		        <version>2.19.1</version>
 		    </plugin>
+		    <plugin>
+        		<artifactId>maven-assembly-plugin</artifactId>
+        		<version>2.5.3</version>
+        		<configuration>
+          			<descriptor>src/assembly/zip.xml</descriptor>
+          			<finalName>JMeterForAppian</finalName>
+          			<appendAssemblyId>true</appendAssemblyId>
+        		</configuration>
+        		<executions>
+          			<execution>
+            		<id>create-archive</id>
+            		<phase>package</phase>
+            		<goals>
+              			<goal>single</goal>
+            		</goals>
+          		</execution>
+        	</executions>
+      </plugin>
     	</plugins>
     </build>
 </project>

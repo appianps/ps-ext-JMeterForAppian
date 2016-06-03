@@ -25,9 +25,10 @@ If your team cannot directly enhance the framework, please make sure to contact 
 #### Installation ###
 
 1. Download the newest version of [JMeter 3.0](http://apache.mirror.serversaustralia.com.au//jmeter/binaries/apache-jmeter-3.0.zip).
-1. Place these two files in `JMETER_HOME\lib\ext` with the versions from the release:
- 1. `ApacheJMeter_http.jar` (replace the OOTB version)
- 1. `jmeter-for-appian-X.X.jar`
+1. Unzip the release package and put the contents into JMETER_HOME which contains the following:
+ 1. `ApacheJMeter_http.jar` replaces the OOTB version with a few changes
+ 1. `jmeter-for-appian-X.X.jar` contains Appian specific functionality
+ 1. `jmeter.properties` turns on cookie settings
 1. Download the example template file `template.jmx` from the release.
 
 #### Recording Your First JMeter Test ####
@@ -111,12 +112,12 @@ As `mvn release:prepare` only commits the updated pom.xml files locally, they ne
 The final release JAR's are placed in the `/target/` folder of each module.
 
 #### Create New Installation Package ####
-1. appian-for-jmeter-X.X.jar
- 1. On the master branch run `mvn package`
- 1. Copy the resulting jar in the target folder to the release.
-1. ApacheJMeter_http.jar 
+1. Run `mvn package`
+1. Upload new package to both the GitHub release and Share Component.
+1. Upload template.jmx to both the GitHub release and Share Component.
+
+If wanting to rebuild the customizations to the core component (to keep up with JMeter updates)
+1. ApacheJMeter_http.jar and ApacheJMeter_components.jar
  1. On the jmeter branch merge the most recent changes from jmeter trunk
  1. run `ant`
- 1. Copy the resulting ApacheJMeter_http.jar from the lib/ext folder to the release.
-1. Copy template.jmx to the release.
-1. Upload new package to both the GitHub release and Share Component.
+ 1. Copy the resulting ApacheJMeter_http.jar and ApacheJMeter_components.jar from the lib/ext folder to the resources folder of the master branch.
