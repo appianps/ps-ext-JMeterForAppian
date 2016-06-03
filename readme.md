@@ -25,41 +25,40 @@ If your team cannot directly enhance the framework, please make sure to contact 
 #### Installation ###
 
 1. Download the newest version of [JMeter 3.0](http://apache.mirror.serversaustralia.com.au//jmeter/binaries/apache-jmeter-3.0.zip).
-1. Place these two files in JMETER_HOME\lib\ext with the versions from the release:
- 1. ApacheJMeter_http.jar (replace the OOTB version)
- 1. jmeter-for-appian-X.X.jar
-1. Download the example template file **template.jmx** from the release.
+1. Place these two files in `JMETER_HOME\lib\ext` with the versions from the release:
+ 1. `ApacheJMeter_http.jar` (replace the OOTB version)
+ 1. `jmeter-for-appian-X.X.jar`
+1. Download the example template file `template.jmx` from the release.
 
-#### Recording Your JMeter Test ####
+#### Recording Your First JMeter Test ####
 
 1. Start JMeter if it isn't already running:
- 1. In a command prompt navigate to *JMETER_HOME\bin*.
+ 1. In a command prompt navigate to `JMETER_HOME\bin`.
  1. Run `jmeter.bat`.
 1. Open template.jmx included in the release.
 1. Update the following in JMeter:
- 1. User Defined Variables (Test Plan and WorkBench) - change **BASE_URL VALUE** to correct site URL
- 1. HTTP Request Defaults (Test Plan and WorkBench) - change **Server Name or IP** to correct site URL.
+ 1. User Defined Variables (Test Plan and WorkBench) - change **BASE_URL** value to the correct site URL
+ 1. HTTP Request Defaults (Test Plan and WorkBench) - change **Server Name or IP** to the correct site URL.
  1. HTTP(S) Test Script Recorder - change **URL Patterns to Include** to correct site URL.  All periods in the middle of the URL must be escaped with a backslash '\'. Leave the .* at the beginning and end of URL.
-1. Start recording
- 1. Click **Start** on HTTP(S) Test Script Recorder
- 1. Install JMeter certificate
-  1. Right click JMETER_HOME\bin\ApacheJMeterTemporaryRootCA.crt and click Install Certificate
-  1. Follow Next > Place all certificates in the following store > **Trusted Root Certification** Authorities > Next > Finish > Yes > OK  
- 1. Configure browser to run through a proxy
-  * Settings > Advanced > Changed proxy settings
-  * LAN settings > Use a proxy server for your LAN
-  * Address: localhost
-  * Port: 8090
+1. Start recording - click **Start** on HTTP(S) Test Script Recorder
+1. Install JMeter certificate
+ 1. Right click `JMETER_HOME\bin\ApacheJMeterTemporaryRootCA.crt` and click Install Certificate
+ 1. Follow Next > Place all certificates in the following store > **Trusted Root Certification Authorities** > Next > Finish > Yes > OK  
+ 1. Configure browser to run through a proxy - Settings > Advanced > Change proxy settings<br />
+ LAN settings > Use a proxy server for your LAN<br />
+ **Address**: localhost<br />
+ **Port**: 8090
  1. At this point samples should be recorded if you navigate to the site URL.
 1. Take the following actions:
  1. Navigate to the login page.
  1. Login
-1. Copy all of the created samples in the **Recording Controller** to the **Login** Test Fragment.
+1. Copy all of the created samples in the **Recording Controller** to the **Login (Test Fragment)**.
 1. Take the following actions:
  1. Navigate to the Actions tab.
  1. Click on an action.
  1. Complete the action.
-1. Copy all of the created samples in the **Recording Controller** to the **Action* Test Fragment.
+1. Stop Recording
+1. Copy all of the created samples in the **Recording Controller** to the **Action (Test Fragment)**.
 1. You can now run the performance test again by clicking the green run arrow and view the results.
  
 ## Development Environment Setup ##

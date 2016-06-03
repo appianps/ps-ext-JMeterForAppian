@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jmeterTestPlan version="1.2" properties="2.9" jmeter="3.1-SNAPSHOT.20160603">
+<jmeterTestPlan version="1.2" properties="2.9" jmeter="3.0 r1743807">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
@@ -63,7 +63,7 @@
           <collectionProp name="ModuleController.node_path">
             <stringProp name="-1227702913">WorkBench</stringProp>
             <stringProp name="764597751">Test Plan</stringProp>
-            <stringProp name="73596745">Login</stringProp>
+            <stringProp name="-1413918436">Login (Test Fragment)</stringProp>
           </collectionProp>
         </ModuleController>
         <hashTree/>
@@ -71,7 +71,7 @@
           <collectionProp name="ModuleController.node_path">
             <stringProp name="-1227702913">WorkBench</stringProp>
             <stringProp name="764597751">Test Plan</stringProp>
-            <stringProp name="1955883606">Action</stringProp>
+            <stringProp name="-1303051735">Action (Test Fragment)</stringProp>
           </collectionProp>
         </ModuleController>
         <hashTree/>
