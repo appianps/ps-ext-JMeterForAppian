@@ -116,7 +116,8 @@ The final release JAR's are placed in the `/target/` folder of each module.
 1. Upload new package to both the GitHub release and Share Component.
 1. Upload template.jmx to both the GitHub release and Share Component.
 
-If wanting to rebuild the customizations to the core component (to keep up with JMeter updates)
+If wanting to rebuild the customizations to the JMeter core components (to keep up with JMeter updates)
+
 1. ApacheJMeter_http.jar and ApacheJMeter_components.jar
  1. On the jmeter branch merge the most recent changes from jmeter trunk
  1. run `ant`
