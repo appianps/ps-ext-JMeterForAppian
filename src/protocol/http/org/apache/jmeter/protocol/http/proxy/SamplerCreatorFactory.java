@@ -96,6 +96,9 @@ public class SamplerCreatorFactory {
     public SamplerCreator getSamplerCreator(HttpRequestHdr request,
             Map<String, String> pageEncodings, Map<String, String> formEncodings) {
         SamplerCreator creator = samplerCreatorMap.get(request.getContentType());
+        if (creator == null) {
+            creator = samplerCreatorMap.get(request.getAccept());
+        }
         if(creator == null) {
             return DEFAULT_SAMPLER_CREATOR;
         }
