@@ -84,7 +84,7 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 	}
 
 	private void handleTaskId(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
-		if (getResponse(result).contains("taskId")) {
+		if (getResponse(result).contains("\"taskId\"")) {
 			children.add(createJsonPostProcessor(sampler, "TASK_ID", "$.taskId"));
 		}
 
@@ -126,7 +126,7 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 
 		if (sampler.hasArguments()) {
 			String jsonString = getRequest(sampler);
-			String out = jsonString.replaceAll("\\{\"context\":\\{[^}]+}", "{\"context\":\\${CONTEXT}");
+			String out = jsonString.replaceAll("\\\"context\":\\{[^}]+}", "\"context\":\\${CONTEXT}");
 			setRequest(sampler, out);
 		}
 	}
