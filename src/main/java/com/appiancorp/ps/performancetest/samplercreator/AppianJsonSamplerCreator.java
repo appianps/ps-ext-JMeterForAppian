@@ -17,12 +17,18 @@ import org.apache.jmeter.extractor.RegexExtractor;
 import org.apache.jmeter.extractor.gui.RegexExtractorGui;
 import org.apache.jmeter.extractor.json.jsonpath.JSONPostProcessor;
 import org.apache.jmeter.extractor.json.jsonpath.gui.JSONPostProcessorGui;
+import org.apache.jmeter.protocol.http.control.Header;
+import org.apache.jmeter.protocol.http.control.HeaderManager;
 import org.apache.jmeter.protocol.http.proxy.DefaultSamplerCreator;
 import org.apache.jmeter.protocol.http.proxy.SamplerCreator;
 import org.apache.jmeter.protocol.http.sampler.HTTPSamplerBase;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
+import org.apache.jmeter.testelement.property.CollectionProperty;
+import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.testelement.property.PropertyIterator;
+import org.apache.jmeter.testelement.property.TestElementProperty;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
@@ -37,6 +43,12 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 	private static final List<String> APPIAN_CONTENT_TYPES = Arrays.asList("application/vnd.appian.tv+json", "application/vnd.appian.tv.ui+json");
 	private static final List<String> STANDARD_CONTEXT_TYPES = Arrays.asList(
 			"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "*/*");
+	
+	private static final String HEADER_MANAGER_HEADERS = "HeaderManager.headers";
+	private static final String X_APPIAN_CSRF_TOKEN = "X-APPIAN-CSRF-TOKEN";
+	private static final String X_APPIAN_CSRF_TOKEN_COOKIE = "appianCsrfToken";
+	private static final String X_APPIAN_MP_CSRF_TOKEN = "X-APPIAN-MP-CSRF-TOKEN";
+	private static final String X_APPIAN_MP_CSRF_TOKEN_COOKIE = "appianMultipartCsrfToken";
 
 	private static Map<String, String> saveIntoMap = new HashMap<String, String>();
 	private List<String> paramList;
@@ -79,6 +91,7 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 		handleContext(sampler, result, children);
 		handleSaveInto(sampler, result, children);
 		handleReturns(sampler, result, children);
+		handleCookies(sampler, result, children);
 
 		return children;
 	}
@@ -111,11 +124,6 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 					"\"id\":\\${DOC_ID}, \"#t\":\"CollaborationDocument\"");
 			setRequest(sampler, out);
 		}
-
-		// Parameterize Mutlipart CSRF Token
-		String samplePath = sampler.getPath();
-		out = samplePath.replaceAll("appian_mp_csrf=.*", "appian_mp_csrf=\\${COOKIE___appianMultipartCsrfToken}");
-		sampler.setPath(out);
 	}
 
 	private void handleContext(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
@@ -175,6 +183,26 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 
 		if (StringUtils.isNotEmpty(escapees)) {
 			children.add(createBeanShellPostProcessor(sampler, "Escape Returns", String.format(ESCAPE_RETURNS, escapees)));
+		}
+	}
+	
+	private void handleCookies(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
+		HeaderManager hm = sampler.getHeaderManager();
+		
+		CollectionProperty jp = (CollectionProperty) hm.getProperty(HEADER_MANAGER_HEADERS);
+		PropertyIterator it = jp.iterator();
+		while(it.hasNext()) {
+			TestElementProperty tp = (TestElementProperty) it.next();
+			// Parameterize CSRF Token
+			if (tp.getName().equals(X_APPIAN_CSRF_TOKEN)) {
+				Header h = (Header) tp.getObjectValue();
+				h.setValue("${COOKIE___" + X_APPIAN_CSRF_TOKEN_COOKIE + "}");
+			}
+			// Parameterize Mutlipart CSRF Token
+			if (tp.getName().equals(X_APPIAN_MP_CSRF_TOKEN)) {
+				Header h = (Header) tp.getObjectValue();
+				h.setValue("${COOKIE___" + X_APPIAN_MP_CSRF_TOKEN_COOKIE + "}");
+			}
 		}
 	}
 
