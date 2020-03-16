@@ -24,10 +24,9 @@ If your team cannot directly enhance the framework, please make sure to contact 
 ## Installation ##
 #### Installation ###
 
-1. Download the newest version of [JMeter](http://apache.mirror.serversaustralia.com.au//jmeter/binaries/apache-jmeter-3.0.zip).
+1. Download [JMeter 4.0](https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-4.0.zip).
 1. Unzip the release package and put the contents into JMETER_HOME which contains the following:
  1. `ApacheJMeter_http.jar` replaces the OOTB version with a few changes
- 1. `ApacheJMeter_components.jar` version from OOTB 3.1 trunk with JSON fixes
  1. `jmeter-for-appian-X.X.jar` contains Appian specific functionality
  1. `jmeter.properties` turns on cookie settings
 1. Download the example template file `template.jmx` from the release.
