@@ -24,13 +24,12 @@ If your team cannot directly enhance the framework, please make sure to contact 
 ## Installation ##
 #### Installation ###
 
-1. Download the newest version of [JMeter](http://apache.mirror.serversaustralia.com.au//jmeter/binaries/apache-jmeter-3.0.zip).
+1. Download [JMeter 4.0](https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-4.0.zip). The installation folder will be referred to as JMETER_HOME.
 1. Unzip the release package and put the contents into JMETER_HOME which contains the following:
- 1. `ApacheJMeter_http.jar` replaces the OOTB version with a few changes
- 1. `ApacheJMeter_components.jar` version from OOTB 3.1 trunk with JSON fixes
+ 1. `ApacheJMeter_http.jar` replaces the OOTB version with a few changes.
  1. `jmeter-for-appian-X.X.jar` contains Appian specific functionality
- 1. `jmeter.properties` turns on cookie settings
-1. Download the example template file `template.jmx` from the release.
+ 1. `jmeter.properties` turns on cookie settings, this will replace an existing file.
+1. Download the example template file `template.jmx` from the release. 
 
 #### Recording Your First JMeter Test ####
 
@@ -46,8 +45,7 @@ If your team cannot directly enhance the framework, please make sure to contact 
 1. Install the JMeter certificate:
  1. Right click `JMETER_HOME\bin\ApacheJMeterTemporaryRootCA.crt` and click Install Certificate.
  1. Follow Next > Place all certificates in the following store > **Trusted Root Certification Authorities** > Next > Finish > Yes > OK  
- 1. Configure browser to run through a proxy - Settings > Advanced > Change proxy settings >
- LAN settings > Use a proxy server for your LAN<br />
+ 1. Configure browser to run through a proxy (Firefox is typically the easiest to configure):
  **Address**: localhost<br />
  **Port**: 8090
  1. At this point samples should be recorded if you navigate to the site URL.
