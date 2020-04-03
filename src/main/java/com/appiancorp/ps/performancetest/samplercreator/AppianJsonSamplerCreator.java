@@ -8,9 +8,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.extractor.BeanShellPostProcessor;
 import org.apache.jmeter.extractor.RegexExtractor;
@@ -26,13 +23,15 @@ import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testelement.TestElement;
 import org.apache.jmeter.testelement.property.CollectionProperty;
-import org.apache.jmeter.testelement.property.JMeterProperty;
 import org.apache.jmeter.testelement.property.PropertyIterator;
 import org.apache.jmeter.testelement.property.TestElementProperty;
 import org.apache.jorphan.logging.LoggingManager;
 import org.apache.log.Logger;
 
 import com.jayway.jsonpath.JsonPath;
+
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 
 /**
  * Handles Appian Specific Requests
@@ -43,7 +42,7 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 	private static final List<String> APPIAN_CONTENT_TYPES = Arrays.asList("application/vnd.appian.tv+json", "application/vnd.appian.tv.ui+json");
 	private static final List<String> STANDARD_CONTEXT_TYPES = Arrays.asList(
 			"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8", "*/*");
-	
+
 	private static final String HEADER_MANAGER_HEADERS = "HeaderManager.headers";
 	private static final String X_APPIAN_CSRF_TOKEN = "X-APPIAN-CSRF-TOKEN";
 	private static final String X_APPIAN_CSRF_TOKEN_COOKIE = "appianCsrfToken";
@@ -51,13 +50,14 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 	private static final String X_APPIAN_MP_CSRF_TOKEN_COOKIE = "appianMultipartCsrfToken";
 
 	private static Map<String, String> saveIntoMap = new HashMap<String, String>();
+	private static Map<String, String> cacheKeyMap = new HashMap<String, String>();
 	private List<String> paramList;
 
 	private static final String ESCAPE_RETURNS = "String[] params= {%s};\r\nString param = \"\";\r\nfor(i = 0; i < params.length;i++) {\r\n  param = vars.get(params[i]);\r\n  param = param.replaceAll(\"\\\\r\\\\n\", \"\\\\\\\\r\\\\\\\\n\");\r\n  vars.put(params[i], param);\r\n}";
 
 	/**
-     * 
-     */
+	 * 
+	 */
 	public AppianJsonSamplerCreator() {
 	}
 
@@ -89,7 +89,8 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 		handleProcessModelId(sampler, result, children);
 		handleDocuments(sampler, result, children);
 		handleContext(sampler, result, children);
-		handleSaveInto(sampler, result, children);
+		handleSaveIntos(sampler, result, children);
+		handleCacheKeys(sampler, result, children);
 		handleReturns(sampler, result, children);
 		handleCookies(sampler, result, children);
 
@@ -140,7 +141,7 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 	}
 
 	@SuppressWarnings({ "unchecked", "unused" })
-	private void handleSaveInto(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
+	private void handleSaveIntos(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
 		if (APPIAN_CONTENT_TYPES.contains(result.getContentType())) {
 			JsonPath path = JsonPath.compile("$..[?(@.saveInto && @._cId)]");
 			List<Object> saveIntoObjs = path.read(getResponse(result));
@@ -172,6 +173,56 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "unused" })
+	private void handleCacheKeys(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
+		if (APPIAN_CONTENT_TYPES.contains(result.getContentType())) {
+			JsonPath path = JsonPath.compile("$..[?(@.cacheKey && @._cId)]");
+			List<Object> cacheKeyObjs = path.read(getResponse(result));
+
+			for (Object o : cacheKeyObjs) {
+				JSONObject jo = new JSONObject((Map) o);
+				String cId = (String) jo.get("_cId");
+				String cacheKey = (String) jo.get("cacheKey");
+
+				cacheKeyMap.put(cacheKey, cId);
+				paramList.add("CACHE_KEY" + cId.toUpperCase());
+				children.add(createJsonPostProcessor(sampler, "CACHE_KEY_" + cId.toUpperCase(), "$..[?(@['_cId'] == '" + cId + "')].cacheKey"));
+			}
+		}
+
+		if (sampler.hasArguments()) {
+			String request = getRequest(sampler);
+			Pattern p = Pattern.compile("\"cacheKey\":([^},]+)");
+			Matcher m = p.matcher(request);
+
+			StringBuffer sb = new StringBuffer();
+			while (m.find()) {
+				m.appendReplacement(sb, "\"cacheKey\":\\${CACHE_KEY_" + cacheKeyMap.get(m.group(1)).toUpperCase() + "}");
+			}
+			m.appendTail(sb);
+
+			setRequest(sampler, sb.toString());
+		}
+
+
+		String path = getPath(sampler);
+		if (path.contains("cacheKey=") || path.contains("parameters=")) {
+			Pattern p = Pattern.compile("(cacheKey|parameters)=([^&]+)");
+			Matcher m = p.matcher(path);
+
+			StringBuffer sb = new StringBuffer();
+			while (m.find()) {
+				m.appendReplacement(sb, m.group(1) + "=\\${CACHE_KEY_" + cacheKeyMap.get(m.group(2)).toUpperCase() + "}");
+			}
+			m.appendTail(sb);
+
+			path = sb.toString();
+
+			setPath(sampler, path);
+			setName(sampler, getName(sampler).replaceAll("^([0-9]+) .*$", "$1") + " " + path);
+		}
+	}
+
 	private void handleReturns(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
 		String escapees = "";
 		for (String id : paramList) {
@@ -185,10 +236,10 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 			children.add(createBeanShellPostProcessor(sampler, "Escape Returns", String.format(ESCAPE_RETURNS, escapees)));
 		}
 	}
-	
+
 	private void handleCookies(HTTPSamplerBase sampler, SampleResult result, List<TestElement> children) {
 		HeaderManager hm = sampler.getHeaderManager();
-		
+
 		CollectionProperty jp = (CollectionProperty) hm.getProperty(HEADER_MANAGER_HEADERS);
 		PropertyIterator it = jp.iterator();
 		while(it.hasNext()) {
@@ -248,6 +299,22 @@ public class AppianJsonSamplerCreator extends DefaultSamplerCreator {
 
 	private void setRequest(HTTPSamplerBase sampler, String request) {
 		sampler.getArguments().getArgument(0).setValue(request);
+	}
+
+	private String getPath(HTTPSamplerBase sampler) {
+		return sampler.getPropertyAsString("HTTPSampler.path");
+	}
+
+	private void setPath(HTTPSamplerBase sampler, String path) {
+		sampler.setProperty("HTTPSampler.path", path);
+	}
+
+	private String getName(HTTPSamplerBase sampler) {
+		return sampler.getPropertyAsString("TestElement.name");
+	}
+
+	private void setName(HTTPSamplerBase sampler, String name) {
+		sampler.setProperty("TestElement.name", name);
 	}
 
 	private String getResponse(SampleResult result) {
