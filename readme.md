@@ -120,4 +120,4 @@ How to rebuild the customizations to the JMeter core components (to keep up with
 
 1. On the jmeter branch, merge the most recent changes from `https://github.com/apache/jmeter.git` trunk.
 1. run `ant`.
-1. Copy the resulting `ApacheJMeter_http.jar` and `ApacheJMeter_components.jar` from the `lib/ext` folder to the resources folder of the master branch.
+1. Copy the resulting `ApacheJMeter_http.jar` from the `lib/ext` folder to the resources folder of the master branch.
